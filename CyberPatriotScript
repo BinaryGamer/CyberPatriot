@@ -73,8 +73,10 @@ echo "Finished with changing all passwords"
 #Delete bad users
 #For every user in /etc/passwd file who isn’t mentioned in the README, removes them and deletes everything they have
 for i in $(cat /etc/passwd | cut -d: -f 1,3,6 | grep -e "[5-9][0-9][0-9]" -e "[0-9][0-9][0-9][0-9]" | grep "/home" | cut -d: -f1) ; do
-	if [[ $( grep -ic -e $i $(pwd)/README ) -eq 0 ]]; then	
-		(deluser $i --remove-all-files >> RemovingUsers.txt 2>&1) &  #starts deleting in background
+	if [[ $( grep -ic -e $i $(pwd)/users.txt ) -eq 0 ]]; then	
+		if [[ $( grep -ic -e $i $(pwd)/admin.txt ) -eq 0 ]]; then
+			(deluser $i --remove-all-files >> RemovingUsers.txt 2>&1) &  #starts deleting in background
+		fi
 	fi
 done
 echo "Finished with deleting bad users"
