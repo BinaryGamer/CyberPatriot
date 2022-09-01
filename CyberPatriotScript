@@ -132,7 +132,7 @@ echo "Finished changing users"
 
 
 #Reinstalls many (if not all) of the packages on the computer. Use this if you think the config files were royally messed up and too Trojaned to fix normally. Will take long time
-echo  -n "Reinstall Everything?	"
+echo  -n "Reinstall Everything? (Only do this if you're missing points at the end) (y/n)	"
 read output
 if [[ $output =~ ^[Yy]$ ]]
 then 
@@ -589,7 +589,7 @@ echo "Finished looking for suspicious files with SUID permissions"
 apt-get install rkhunter tree debsums libpam-cracklib chkrootkit clamav lynis -y > /dev/null 2>&1 
 
 # VSFTPD
-echo -n "Should VSFTP Be Installed/Reinstalled? [Y/n] "
+echo -n "Should VSFTP Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
 read option
 if [[ $option =~ ^[Yy]$ ]]
 then
@@ -606,7 +606,7 @@ fi
 
 
 # Apache2
-echo -n "Should Apache2 Be Installed/Reinstalled? [Y/n] "
+echo -n "Should Apache2 Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
 read option
 if [[ $option =~ ^[Yy]$ ]]
 then
@@ -639,7 +639,7 @@ fi
 
 
 # MySQL
-echo -n "Should MySQL Be Installed/Reinstalled? [Y/n] "
+echo -n "Should MySQL Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
 read option
 if [[ $option =~ ^[Yy]$ ]]
 then
@@ -656,7 +656,7 @@ fi
 
 
 # Php
-echo -n "Should PHP5 Be Installed/Reinstalled? [Y/n] "
+echo -n "Should PHP5 Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
 read option
 if [[ $option =~ ^[Yy]$ ]]
 then
@@ -682,7 +682,7 @@ fi
 
 
 # SSH
-echo -n "Should SSH Be Installed/Reinstalled? [Y/n] "
+echo -n "Should SSH Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
 read option
 if [[ $option =~ ^[Yy]$ ]]
 then
@@ -840,12 +840,12 @@ disown; sleep 2;
 
 #install Clamav onto the computer and begin running it
 #apt-get install clamav	gets installed earlier
-( freshclam; clamscan -r --bell -i / >> Clamav.txt; echo "Finished Clamav scanning" ) &
-disown; sleep 2; 
+#( freshclam; clamscan -r --bell -i / >> Clamav.txt; echo "Finished Clamav scanning" ) &
+#disown; sleep 2; 
 
 #Starts lynis, which helps in securing computer
-( lynis -c -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
-disown; sleep 2; 
+#( lynis -c -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
+#disown; sleep 2; 
 #big q is don’t wait for user input, lower q is only show warnings, -c is do it for whole system
 
 #https://github.com/bstrauch24/cyberpatriot/blob/master/security.sh (is able to accept feedback)
