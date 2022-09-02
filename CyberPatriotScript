@@ -778,8 +778,6 @@ service ssh restart
 echo "" >> WorkProperly.txt
 echo "Finished with SSH"
 
-else
-	dpkg --purge ssh openssh-server openssh-client > /dev/null 2>&1 
 fi
 
 
