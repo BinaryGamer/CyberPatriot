@@ -1,5 +1,5 @@
 #!/bin/bash
-#This is a script written by Ryan Galligher in order to assist him in fixing vulnerabilities in the CyberPatriot competition.
+#This is a script written by Ryan Galligher in order to assist him in fixing vulnerabilities in the CyberPatriot competition, and updated by Liam Smith for use with Cyber Taipan.
 #This code comes as is and may not work on future versions of Linux or software it attempts to fix. Always test this on a non-competition image before use.
 
 
