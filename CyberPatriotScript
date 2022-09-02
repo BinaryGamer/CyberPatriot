@@ -145,6 +145,7 @@ echo -n "Update Everything? (y/n)	"
 read output
 if [[ $output =~ ^[Yy]$ ]]
 then
+	apt-get install update
 	apt-get upgrade
 fi
 
