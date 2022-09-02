@@ -141,14 +141,6 @@ then
 	apt-get -V -y install --reinstall coreutils
 fi
 
-echo -n "Update Everything? (y/n)	"
-read output
-if [[ $output =~ ^[Yy]$ ]]
-then
-	apt-get install update
-	apt-get upgrade
-fi
-
 
 
 
