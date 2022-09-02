@@ -594,7 +594,7 @@ echo "Finished looking for suspicious files with SUID permissions"
 
 
 #install the needed programs like rkhunter, tree, etc
-apt-get install rkhunter tree debsums libpam-cracklib chkrootkit clamav lynis -y > /dev/null 2>&1 
+#apt-get install rkhunter tree debsums libpam-cracklib chkrootkit clamav lynis -y > /dev/null 2>&1 
 
 # VSFTPD
 echo -n "Should VSFTP Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
@@ -831,11 +831,11 @@ clear
 #Doing all of that as (;;;) & will cause the output to show up in that terminal not a new one, but it is executed asynchronously.
 
 #Runs rkhunter and saves any warnings
-(echo "rkhunter says:" >> Warnings.rkhunter.txt; rkhunter -c --rwo >> Warnings.rkhunter.txt; echo "" >> Warnings.txt; echo "Finished rkhunter scan" ) &
+#(echo "rkhunter says:" >> Warnings.rkhunter.txt; rkhunter -c --rwo >> Warnings.rkhunter.txt; echo "" >> Warnings.txt; echo "Finished rkhunter scan" ) &
 disown; sleep 2; 
 
 #run chkrootkit and save output into Warnings
-( echo "Chkrootkit found (NOTE There may be false positives):" >> Warnings.chkrootkit.txt; chkrootkit -q >> Warnings.txt; echo "" >> Warnings.txt; echo "Finished chkrootkit scan" ) &
+#( echo "Chkrootkit found (NOTE There may be false positives):" >> Warnings.chkrootkit.txt; chkrootkit -q >> Warnings.txt; echo "" >> Warnings.txt; echo "Finished chkrootkit scan" ) &
 disown; sleep 2; 
 
 
