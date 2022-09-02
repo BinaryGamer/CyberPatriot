@@ -595,6 +595,7 @@ echo "Finished looking for suspicious files with SUID permissions"
 
 #install the needed programs like rkhunter, tree, etc
 #apt-get install rkhunter tree debsums libpam-cracklib chkrootkit clamav lynis -y > /dev/null 2>&1 
+apt-get -y install debsums tree libpam-cracklib > /dev/null 2>&1
 
 # VSFTPD
 echo -n "Should VSFTP Be Installed/Reinstalled? (don't unless you need it specifically) [Y/n] "
