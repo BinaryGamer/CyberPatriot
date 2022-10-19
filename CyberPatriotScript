@@ -1,4 +1,4 @@
-#!/bin/bash
+]#!/bin/bash
 #This is a script written by Ryan Galligher in order to assist him in fixing vulnerabilities in the CyberPatriot competition, and updated by Liam Smith for use with Cyber Taipan.
 #This code comes as is and may not work on future versions of Linux or software it attempts to fix. Always test this on a non-competition image before use.
 
@@ -19,6 +19,7 @@
 
 #save all of the logs before you begin messing with stuff
 mkdir logs
+echo "Here are some details of what has been done: " > logs/recaps.txt
 echo "auth log:" > logs/authLogs.txt
 cat /var/log/auth.log >> logs/authLogs.txt
 #echo "" > logs/authLogs.txt
@@ -52,6 +53,8 @@ fi
 
 #change root password
 yes "H3LL0@" | passwd
+echo "Root password set to H3LL0@ (Letter H, Number 3, Letter L, Letter L, Number 0, Symbol @" > logs/recaps.txt
+
 echo "Finished with changing root password"
 echo "" > usersChanged.txt
 
@@ -68,6 +71,7 @@ for i in $(cat /etc/passwd | cut -d: -f 1,3,6 | grep -e "[5-9][0-9][0-9]" -e "[0
 	echo $i  >> usersChanged.txt
 done;
 echo "Finished with changing all passwords"
+echo "Changed all the passwords of user accounts to this password ^" > logs/recaps.txt
 
 
 #Delete bad users
@@ -80,12 +84,15 @@ for i in $(cat /etc/passwd | cut -d: -f 1,3,6 | grep -e "[5-9][0-9][0-9]" -e "[0
 	fi
 done
 echo "Finished with deleting bad users"
+echo "deleted bad users" > logs/recaps.txt
 
 #For everyone in the addusers file, creates the user
 echo "" >> addusers.txt
 for i in $(cat $(pwd)/addusers.txt); do
 	useradd $i;
+	echo "Added a user" > logs/recaps.txt
 done
+echo "added any required user" > logs/recaps.txt
 echo "Finished adding users"
 
 #Goes and makes users admin/not admin as needed
@@ -127,6 +134,7 @@ if [[ $( echo $( grep "adm" /etc/group) | grep -ic $i ) -eq 0 ]]; then
 	fi
 done
 echo "Finished changing users"
+echo "Changed permissions of all the users" > logs/recaps.txt
 
 #Also need to add a check for if in other insecure places like shadow group
 
@@ -139,6 +147,7 @@ read output
 if [[ $output =~ ^[Yy]$ ]]
 then 
 	apt-get -V -y install --reinstall coreutils
+	echo "reinstalled coreutils" > logs/recaps.txt
 fi
 
 echo -n "Update Everything? (y/n)	"
@@ -147,6 +156,7 @@ if [[ $output =~ ^[Yy]$ ]]
 then
 	apt-get install update
 	apt-get upgrade
+	echo "attempted 'apt-get install update' and 'apt-get upgrade' to update basically everything" > logs/recaps.txt
 fi
 
 
@@ -156,9 +166,11 @@ echo "This will attempt to turn on firewall and turn on logging" > Firewall.txt
 echo "Starting Download of ufw, this may take awahile"
 #Turns the firewall on, resets ufw to default, the turns logging on high, and adds in some standard rules. Firestarter package might be good gui for ufw
 apt-get install ufw -y >> /dev/null 2>&1
+echo "installing firewall" > logs/recaps.txt
 (ufw enable  >> Firewall.txt; yes | ufw reset  >> Firewall.txt; ufw enable  >> Firewall.txt; ufw allow http; ufw allow https; ufw deny 23; ufw deny 2049; ufw deny 515; ufw deny 111; ufw logging high >> Firewall.txt; echo "" >> Firewall.txt) &
 #The little & at the end will cause this entire section of code to be run synchronously with the rest of this script, meaning that it will execute in the background while the rest of this script continues on. NOTE: IF YOU CLOSE THE TERMINAL, IT WILL TERMINATE THIS BACKGROUND PROCESS AS WELL.
 echo "Working on ufw"
+echo "setup firewall" > logs/recaps.txt
 #allow http - means
 #allow https - means
 #deny 23 - means
@@ -203,20 +215,23 @@ echo "Working on ufw"
 
 #Will go into the lightdm library and turn off guest accounts
 /usr/lib/lightdm/lightdm-set-defaults -l false
-echo $? >> WorkProperly.txt
-echo "if last was 0, then lightdm was turned off properly" >> WorkProperly.txt
+echo $? >> logs/recaps.txt
+echo "if last was 0, then lightdm was turned off properly" >> logs/recaps.txt
 
 echo "allow-guest=false" >> /etc/lightdm/lightdm.conf
 echo "" >> WorkProperly.txt
+echo "" > logs/recaps.txt
 
 #Disables guest option and usernames on login screen (in /etc/lightdm/lightdm.conf)
 TEXT="[SeatDefaults]\nautologin-guest=false\nautologin-user=none\nautologin-user-timeout=0\nautologin-session=lightdm-autologin\nallow-guest=false\ngreeter-hide-users=true"
 printf $TEXT > /etc/lightdm/lightdm.conf
 echo "Finished with Guest accounts"
+echo "finished locking guest accounts" > logs/recaps.txt
 
 #Lock people from logging straight into the root account
 passwd -l root
 echo "Finished locking the root account"
+echo "locked the root account" > logs/recaps.txt
 
 #Change the ownership and permissions of files that could commonly be exploited otherwise
 chown root:root /etc/securetty
@@ -231,6 +246,7 @@ chmod 440 /etc/sudoers
 chmod 640 /etc/shadow
 chown root:root /etc/shadow
 echo "Finished changing permissions"
+echo "changed commonly exploited file permissions" > logs/recaps.txt
 
 
 #Remove unwanted alias
@@ -314,6 +330,7 @@ done
 echo "" >> WorkProperly.txt
 
 echo "Finished with sudoers, fixed main sudoers and cleaned README and tried to delete any other ones"
+echo "replaced sudoers file with a clean one in hopes of " > logs/recaps.txt
 fi
 
 #enable cookie protection
@@ -365,6 +382,7 @@ net.ipv6.conf.all.accept_redirects=0
 " >> /etc/sysctl.conf
 sysctl --system > /dev/null
 echo "Enabled Cookie Protection"
+echo "enabled cookie protection" > logs/recaps.txt
 
 
 
@@ -374,6 +392,7 @@ echo "APT::Periodic::Update-Package-Lists \"1\";
 APT::Periodic::Download-Upgradeable-Packages \"0\";
 APT::Periodic::AutocleanInterval \"0\";" > /etc/apt/apt.conf.d/10periodic
 echo "Checks for updates automatically"
+echo "daily updates have been set (check manually if no points awarded)" > logs/recaps.txt
 
 
 #makes updates also come from right places, updates repositories. However, it does not clear out ones there, so remember to do so
@@ -392,12 +411,14 @@ else
 add-apt-repository "deb http://security.debian.org wheezy/updates main"
 add-apt-repository "deb-src http://security.debian.org wheezy/updates main"
 fi
+echo "Updating sources for updates - rerun the update scripts from earlier if errors popped up" > logs/recaps.txt
 
 
 #Cleans out the path file in case it has been modified to point to illegal places, makes a copy to the desktop in case you wanted to see it
 cp /etc/environment $(pwd)/environment
 echo "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"" > /etc/environment
 echo "Finished cleaning the PATH"
+echo "Cleaned out path" > logs/recaps.txt
 
 
 #restart all of the DNS caches to clear out any unwanted connections
@@ -414,11 +435,13 @@ echo "After" >> cacheClearing.txt
 free >> cacheClearing.txt
 echo "Finished restarting caches"
 service xinetd reload
+echo "Restarted cache" > logs/recaps.txt
 
 
 
 #Save all of the currently running services to be looked at later
 ( service --status-all 2>&1 | grep "+" >> Services.txt 2>&1 ; echo “Finished Printing out services” ) &
+echo "Current services running are saved in Services.txt" > logs/recaps.txt
 
 
 
@@ -442,6 +465,7 @@ done
 
 echo "" >> Warnings.txt
 echo "Finished with Looking for hidden root users and removing them"
+echo "Finished with looking for hidden root users and removing them (remember to check for warnings in Warnings.txt)" > logs/recaps.txt
 
 
 #for i in $(cat /etc/passwd | cut -d: -f 1,3,6 | grep -e "[5-9][0-9][0-9]" -e "[0-9][0-9][0-9][0-9]" | grep "/home" | cut -d: -f1); do
@@ -486,6 +510,7 @@ for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
 done
 echo "" >> Warnings.txt
 echo "Finished looking for Netcat Backdoors"
+echo "Finished looking for Netcat Backdoors, look in Warnings.txt for any extra info" > logs/recaps.txt
 
 #Remove any bad files that are in the users cron in /var/spool/cron/crontabs
 for i in $(ls /var/spool/cron/crontabs); do
@@ -539,6 +564,7 @@ for (( i=0; $i<$tLen; i++)); do
 		fi
 	fi
 done;
+echo "Attempted to remove packages john, telnetd, logkeys, Hydra, hydra, fakeroot, nmap, Crack, crack, medusa, nikto, tightvnc, bind9, avahi, cupsd, postfix, ninx, frostwire, vuze, samba, apache2, ftp, csftpd, netcat, openssh, weplab, pyrit, mysql, php5, proftpd-basic, filezilla, postgresql, irssi" > logs/recaps.txt
 
 
 #dpkg --remove bind		//open DNS server
@@ -573,6 +599,7 @@ echo "" > allThePackages.txt
 echo "Media files:" > mediaFiles.txt
 ( for i in "*.jpg" "*.mp4" "*.mp6" "*.mp3" "*.mov" "*.png" "*.jpeg" "*.gif" "*.zip" "*.wav" "*.tif" "*.wmv" "*.avi" "*.mpeg" "*.tiff" "*.tar"; do find /home -name $i >> mediaFiles.txt; done; echo "" >> mediaFiles.txt ; echo "Done looking for bad media files" ) &
 
+echo "Searching for media files, look in allMediaFiles.txt" > logs/recaps.txt
 #Looks and sees if there are any illegal media files found on the computer as a total
 echo "Media files:" > allMediaFiles.txt
 ( for i in "*.jpg" "*.mp4" "*.mp6" "*.mp3" "*.mov" "*.png" "*.jpeg" "*.gif" "*.wav" "*.tif" "*.tiff" "*.wmv" "*.avi" "*.mpeg"; do find / -name $i >> allMediaFiles.txt; done; echo "" >> allMediaFiles.txt ; echo "Done looking for bad media files" ) &
@@ -582,6 +609,7 @@ echo "Suspicious SUID permission files" > suspectFind.txt
 find / -type f \( -perm -04000 -o -perm -02000 \) >> suspectFind.txt 
 echo "" >> suspectFind.txt
 echo "Finished looking for suspicious files with SUID permissions"
+echo "Finished looking for suspicious files with SUID permissions" > logs/recaps.txt
 
 
 #Finds files that appear to be placed down by no one. Would tell you if someone placed down something, then removed their user leaving that file around
@@ -591,6 +619,7 @@ echo "Finished looking for suspicious files with SUID permissions"
 ( echo "finding world writable files" >> worldWrite.txt; find / -perm -2 ! -type l -ls >> worldWrite.txt; echo "Finished looking for world writable files") &
 
 
+echo "Looking for suspect files, look in suspectFind.txt and worldWrite.txt" > logs/recaps.txt
 
 
 #install the needed programs like rkhunter, tree, etc
@@ -609,6 +638,7 @@ then
 	# FTP user directories use chroot
 	sed -i '/^chroot_local_user/ c\chroot_local_user=YES  #' /etc/vsftpd.conf
 	service vsftpd restart
+	echo "Installed/Reinstalled VSFTP" > logs/recaps.txt
 else
 	dpkg --purge vsftpd > /dev/null 2>&1 
 fi
@@ -641,6 +671,7 @@ echo "<Directory />
 		echo UserDir disabled root >> /etc/apache2/apache2.conf
 	fi
 #THIS MAY BREAK APACHE2, NOT ENTIRELY SURE, TEST FIRST
+	echo "Installed/Reinstalled Apache2" > logs/recaps.txt
 
  else
 	  dpkg --purge apache2 > /dev/null 2>&1 
@@ -658,6 +689,7 @@ file=$( echo /etc/mysql/my.cnf )
 #bind-address = 127.0.0.1 #
 sed -i 's/bind-address/bind-address = 127.0.0.1 # /g' $file
 service mysql restart
+	echo "Installed/Reinstalled MySQL" > logs/recaps.txt
 
  else
 	  dpkg --purge mysql-server php5-mysql > /dev/null 2>&1 
@@ -685,6 +717,7 @@ sed -i 's/disable_functions=/disable_functions=exec,shell_exec,passthru,system,p
 sed -i 's/upload_max_filesize/upload_max_filesize = 2M ; /g' $file
 sed -i 's/max_execution_time/max_execution_time = 30 ; /g' $file
 sed -i 's/max_input_time/max_input_time = 60 ; /g' $file
+	echo "Installed/Reinstalled PHP5" > logs/recaps.txt
 else
 	  dpkg --purge php5 > /dev/null 2>&1 
 fi
@@ -784,6 +817,7 @@ UsePAM yes" > /etc/ssh/sshd_config
 service ssh restart
 echo "" >> WorkProperly.txt
 echo "Finished with SSH"
+	echo "Installed/Reinstalled OpenSSH" > logs/recaps.txt
 
 fi
 
@@ -791,6 +825,7 @@ fi
 #Looks at the entire list of users so you can see what they all have
 ( tree /home >> homeDirectory.txt; echo "Finished saving entire home directory" ) &
 
+echo "Saved home directory of each user to homeDirectory.txt" > logs/recaps.txt
 #Add password policy
 echo " " > /tmp/stuff
 #echo "How many days do you want the max to be?" -n
@@ -803,11 +838,13 @@ sed  -i 's/PASS_MIN_DAYS\t0/PASS_MIN_DAYS\t10/g' /etc/login.defs
 
 sed -i 's/password\trequisite\t\t\tpam_cracklib.so/password\trequisite\t\t\tpam_cracklib.so ucredit=-1 lcredit=-1 ocredit=-1 dcredit=-1/g' /etc/pam.d/common-password
 
+echo "Set MAX/MIN password dates to 15 and 10 days" > logs/recaps.txt
 
 #echo "password requisite pam_cracklib.so retry=3 minlen=6 difok=3 reject_username minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1" >> /etc/pam.d/common-password
 #The sed command above should add the necessary stuff
 
-echo "#auth optional pam_tally.so deny=5 unlock_time=900 onerr=fail audit silent " >> /etc/pam.d/common-auth
+echo "#auth optional pam_tally.so deny=5 unlock_time=5 onerr=fail audit silent " >> /etc/pam.d/common-auth
+echo "Set password lockout time to 5 seconds after 5 tries :/" > logs/recaps.txt
 echo "password requisite pam_pwhistory.so use_authtok remember=24" >>  /etc/pam.d/common-password
 
 #echo "Finished Password Policy"
@@ -817,7 +854,7 @@ cp /etc/pam.d/common-auth /etc/pam.d/common-auth~
 echo "auth [success=1 default=ignore] pam_unix.so nullok_secure 
 auth required pam_deny.so 	#was requisite
 auth required pam_permit.so
-auth required pam_tally2.so onerr=fail deny=3 unlock_time=1800" > /etc/pam.d/common-auth
+auth required pam_tally2.so onerr=fail deny=3 unlock_time=5" > /etc/pam.d/common-auth
 echo "Lockout policy enabled"
 
 
@@ -828,6 +865,8 @@ gnome-terminal -e "bash -c \"(apt-get update; apt-get upgrade -y; apt-get dist-u
 #This will start a new terminal, uses disown to cut itself off from getting canceled from the original terminal, sleep for a bit for the error code, then sends contrl+c to the current terminal to allow script to continue ($$ means this script’s PID) THE KILL IS NOT NECESSARY
 echo "updating in progress"
 echo "updating in progress"
+
+echo "Started updates" > logs/recaps.txt
 clear
 #Doing all of that as (;;;) & will cause the output to show up in that terminal not a new one, but it is executed asynchronously.
 
@@ -862,6 +901,7 @@ disown; sleep 2;
 #https://github.com/hexidecimals/cyberpatriot/blob/master/linux.sh (has way to find readme by itself)
 
 message="The script has finished executing on this computer. This is being run as $(whoami) and has $(finger $(whoami) )."
+echo $message > logs/recaps.txt
 number=0000000001
 #sendtext () { curl http://textbelt.com/text -d number=$number -d "message=$message";echo message sent; }
 #sendtext();
